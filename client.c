@@ -1,6 +1,6 @@
 #include"config.h"
 
-#define BUF_SIZE 100
+#define BUF_SIZE 10
 int main(){
 	int len,n;
 	int s; 
@@ -20,18 +20,22 @@ int main(){
 	}
 	printf("client:connected\n");
 	while(1){
-		memset(buf,'q',BUF_SIZE);
+		memset(buf,'\0',BUF_SIZE);
 		buf[BUF_SIZE-1]='\0';
 		scanf("%s",buf);
-		if(buf[0]=='q'){
-			break;
-		}
-		if((n=send(s,buf,len,BUF_SIZE))==-1){
+		n=send(s,buf,strlen(buf),0);
+		if(n<=0){
 			perror("client:send() failed");
 			break;
 		}
+		printf("client send msg:%s %d\n",buf,n);
+		if(buf[0]=='q'){
+			break;
+		}
+		
 		usleep(1000);
-		if((n=recv(s,buf,BUF_SIZE,0))==-1){
+		n=recv(s,buf,BUF_SIZE,0);
+		if(n<=0){
 			perror("client:recv() failed");
 			break;
 		}

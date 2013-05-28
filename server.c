@@ -1,25 +1,37 @@
 #include"config.h"
 
-#define BUF_SIZE 100
+#define BUF_SIZE 10
 
 void *loop(void* s){
 	char buf[BUF_SIZE];
 	int n=0;
 	unsigned int socketfd=*(( int *)s);
-	printf("a new threand is listening the client\n");
+	printf("a new thread in server\n");
+	
 	while(1){
-		if((n==recv(socketfd,buf,BUF_SIZE,0))==-1){
-			perror("server:recv() failed");
-			return;
+		memset(buf,'\0',BUF_SIZE);
+		n=recv(socketfd,buf,BUF_SIZE,0);
+		if(n==-1||n==0){
+			perror("thread:recv() failed");
+			break;
+			//continue;
 		}
-		buf[n]='\0';
 		usleep(1000);
-		printf("server:revice msg: %s\n",buf);
-		if((n=send(socketfd,buf,BUF_SIZE,0))==-1){
-			perror("server:send() failed");
-			return;
+		printf("server thread :revice msg: %s %d\n",buf,n);
+		if(buf[0]=='q'){
+			break;
 		}
+		printf("server thread:trying to send :");
+		n=send(socketfd,buf,strlen(buf),0);
+		if(n<=0){
+			perror("server thread:send() failed");
+			break;
+			//continue;
+		}
+		printf(" %s\n",buf);
+		memset(buf,0,BUF_SIZE);
 	}
+	printf("server thread:close\n");
 	close(socketfd);
 
 }
@@ -83,10 +95,12 @@ int main(){
 		}
 		printf("server:connected\n");
 		pthread_create(&tid,NULL,loop,(void*)&c_socket);
+		printf("create a new thread\n");
 		/*
 		unlike using fork(),we should not close the c_socket here 
 		*/
 
 	}
+	printf("server:close\n");
 	return 0;
 }
