@@ -14,9 +14,9 @@ void Client::start(){
 	}
 	printf("client is trying to connect to the server ...\n");
 	_remote.sun_family=AF_UNIX;
-	strcpy(remote.sun_path,SOCKET_PATH);
-	len=strlen(remote.sun_path)+sizeof(remote.sun_family);
-	if(connect(_sock,(struct sockaddr*)&remote,len)==-1){
+	strcpy(_remote.sun_path,SOCKET_PATH);
+	len=strlen(_remote.sun_path)+sizeof(_remote.sun_family);
+	if(connect(_sock,(struct sockaddr*)&_remote,len)==-1){
 		perror("client connect failed\n");
 		return;
 	}
@@ -48,7 +48,7 @@ void Client::start(){
 		}
 		pthread_t tid=0;
 		memcpy(&tid,buf,sizeof(tid));
-		printf("client recv msg from %d \n",tid);
+		printf("client recv msg from %ld \n",tid);
 	}
 	close(_sock);
 }

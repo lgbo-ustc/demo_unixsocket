@@ -8,6 +8,7 @@ struct fd_tid{
 };
 
 ServerThreadA::ServerThreadA(){
+	printf("ServerThreadA\n");
 	_finished=false;
 	_server=Server::instance();
 }
@@ -16,10 +17,14 @@ ServerThreadA::ServerThreadA(){
 void* _threadLoop(void* arg){
 	char buf[BUFFER_SIZE];
 	int n=0;
-	ServerThreadA* th=(ServerThreadA*)th;
+	ServerThreadA* th=(ServerThreadA*)arg;
+	std::cout<<"_threadLoop"<<std::endl;
+	int fd=th->sockfd();
 	while(1){
 		memset(buf,0,BUFFER_SIZE);
+		std::cout<<"recv 1"<<std::endl;
 		n=recv(th->sockfd(),buf,BUFFER_SIZE,0);
+		std::cout<<"recv 2"<<std::endl;
 		if(n<=0){
 			printf("thread %ld recv() failed\n",th->tid());
 			break;
@@ -45,7 +50,7 @@ void* _threadLoop(void* arg){
 
 void ServerThreadA::start(int fd){
 	_fd=fd;
-
+	printf("ServerThreadA::start\n");
 	pthread_create(&_tid,NULL,_threadLoop,(void*)this);
 }
 
